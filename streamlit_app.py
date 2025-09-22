@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import io
 import json
 import random
+import os
 
 # --- 페이지 기본 설정 ---
 st.set_page_config(
@@ -369,7 +370,7 @@ with tab4:
     
     # --- 여기가 바로 오류 수정 부분입니다! ---
     # 파일 경로를 코드 파일 기준으로 절대 경로로 만들어줍니다.
-    base_path = os.path.dirname(__file__)
+    base_path = base_path = os.getcwd()
     image_path = os.path.join(base_path, city_info["img"])
 
     try:
