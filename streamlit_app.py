@@ -149,8 +149,6 @@ def load_data():
 # --- 대한민국 지도 GeoJSON 데이터 로드 ---
 @st.cache_data
 def load_korea_geojson():
-    # 출처: https://github.com/southkorea/southkorea-maps
-    # 라이선스에 따라 출처 명시
     with open('skorea-provinces-2013-geo.json', 'r', encoding='utf-8') as f:
         korea_geojson_data = json.load(f)
     return korea_geojson_data
@@ -164,7 +162,7 @@ try:
     korea_geojson = load_korea_geojson()
 except FileNotFoundError:
     st.error("대한민국 지도 파일('skorea-provinces-2013-geo.json')을 찾을 수 없습니다. 코드와 같은 폴더에 지도 파일을 넣어주세요.")
-    korea_geojson = None # 지도가 없어도 앱이 멈추지 않도록 설정
+    korea_geojson = None
 
 baseline_2020_level = gmsl_df[gmsl_df['연도'] == 2020]['해수면 높이 (mm)'].iloc[0]
 gmsl_df['해수면 높이 (mm)'] = gmsl_df['해수면 높이 (mm)'] - baseline_2020_level
@@ -360,17 +358,28 @@ with tab4:
     rise_level_m = st.slider("미래 해수면 상승 높이 선택 (단위: m)", 0.5, 2.0, 1.0, 0.1)
 
     city_scenarios = {
-        "인천 (대한민국)": {"img": "/workspaces/gdp-dashboard-5/incheon.png", "base_pop": 800000, "base_econ": "공항/항만 기능"},
-        "뉴욕 (미국)": {"img": "/workspaces/gdp-dashboard-5/newyork.png", "base_pop": 2000000, "base_econ": "세계 금융 중심지"},
-        "상하이 (중국)": {"img": "/workspaces/gdp-dashboard-5/shanghai.png", "base_pop": 17500000, "base_econ": "글로벌 물류 허브"},
-        "암스테르담 (네덜란드)": {"img": "/workspaces/gdp-dashboard-5/amsterdam.png", "base_pop": 1200000, "base_econ": "기존 방재 시스템"},
-        "도쿄 (일본)": {"img": "/workspaces/gdp-dashboard-5/tokyo.png", "base_pop": 1500000, "base_econ": "수도 기능 및 경제 중심지"}
+        "인천 (대한민국)": {"img": "images/incheon.png", "base_pop": 800000, "base_econ": "공항/항만 기능"},
+        "뉴욕 (미국)": {"img": "images/newyork.png", "base_pop": 2000000, "base_econ": "세계 금융 중심지"},
+        "상하이 (중국)": {"img": "images/shanghai.png", "base_pop": 17500000, "base_econ": "글로벌 물류 허브"},
+        "암스테르담 (네덜란드)": {"img": "images/amsterdam.png", "base_pop": 1200000, "base_econ": "기존 방재 시스템"},
+        "도쿄 (일본)": {"img": "images/tokyo.png", "base_pop": 1500000, "base_econ": "수도 기능 및 경제 중심지"}
     }
     selected_city = st.selectbox("확인하고 싶은 도시를 선택하세요:", list(city_scenarios.keys()))
     city_info = city_scenarios[selected_city]
     
-    st.image(city_info["img"], caption=f"{selected_city} {rise_level_m}m 상승 시 침수 예상 시나리오 (가상 이미지)")
-    
+    # --- 여기가 바로 오류 수정 부분입니다! ---
+    # 파일 경로를 코드 파일 기준으로 절대 경로로 만들어줍니다.
+    base_path = os.path.dirname(__file__)
+    image_path = os.path.join(base_path, city_info["img"])
+
+    try:
+        st.image(image_path, caption=f"{selected_city} {rise_level_m}m 상승 시 침수 예상 시나리오 (가상 이미지)")
+    except Exception as e:
+        st.error(f"사진 파일을 불러오는 데 실패했습니다. 아래 내용을 확인해주세요:")
+        st.error(f"1. 현재 코드 실행 위치: **{base_path}**")
+        st.error(f"2. 코드가 찾고 있는 사진 경로: **{image_path}**")
+        st.error(f"3. 위 경로에 **`images` 폴더**가 있고, 그 안에 **사진 파일**이 있는지 확인해주세요.")
+
     impact_pop = int(city_info["base_pop"] * (rise_level_m / 1.0))
     col1, col2 = st.columns(2)
     with col1:
@@ -492,7 +501,6 @@ with tab5:
                 st.session_state.card_game_turns = 0
                 st.session_state.card_game_history = []
                 st.rerun()
-
 with tab6:
     st.header("📑 종합 보고서: 요약 및 결론")
     st.markdown("### 1. 서론: 바다의 위기는 어떻게 우리 식탁의 위기가 되는가?")
@@ -529,3 +537,4 @@ with tab6:
     - 해양수산부 통계시스템, 어업생산동향조사
     - 청소년건강행태온라인조사, 국민건강영양조사
     """)
+
