@@ -149,7 +149,6 @@ def load_data():
 # --- 대한민국 지도 GeoJSON 데이터 로드 ---
 @st.cache_data
 def load_korea_geojson():
-    # 인터넷 URL 대신, 지도 데이터를 코드에 직접 내장하여 안정성을 확보합니다.
     # 출처: https://github.com/southkorea/southkorea-maps
     # 라이선스에 따라 출처 명시
     with open('skorea-provinces-2013-geo.json', 'r', encoding='utf-8') as f:
@@ -171,10 +170,16 @@ baseline_2020_level = gmsl_df[gmsl_df['연도'] == 2020]['해수면 높이 (mm)'
 gmsl_df['해수면 높이 (mm)'] = gmsl_df['해수면 높이 (mm)'] - baseline_2020_level
 
 st.title("바다의 경고: 해수면 상승과 우리 식탁의 미래")
-st.markdown("지구 온난화로 인한 해수면 상승은 해양 생태계를 교란하고 결국 우리의 식탁까지 위협하는 연쇄적인 위기입니다. 이 대시보드는 그 위협의 흐름을 데이터로 분석하고 미래를 조망합니다.")
+st.markdown("### 문제 제기\n최근 여름철 기온이 꾸준히 상승하고 있습니다. 이는 지구온난화로 인한 현상이며, 단순한 온도 상승이 아닌 다양한 연쇄적 위기를 불러옵니다.")
+st.markdown("""
+- **빙하 융해:** 북극·남극의 빙하가 급속도로 녹아내립니다.
+- **해양 생태계 파괴:** 해수온이 상승하며 해양 생물의 서식지가 파괴됩니다.
+- **해수면 상승:** 위의 두 요인으로 인해 해수면이 상승하여 해안 도시와 섬 국가가 침수 위기에 처합니다.
+""")
+st.info("이미 태평양의 투발루는 일부 섬이 사라지고 있으며, 몰디브는 국토의 대부분이 해발 1m 이하로, 해수면 상승에 직접적인 위협을 받고 있습니다.")
 st.markdown("---")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 전 지구 해수면 현황", "🇰🇷 대한민국 어획량 현황", "🐟 우리의 식탁", "🏙️ 미래 시나리오", "🎮 인터랙티브 시뮬레이션"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📈 전 지구 현황", "🇰🇷 대한민국 현황", "🐟 우리의 식탁", "🏙️ 미래 시나리오", "🎮 인터랙티브 게임", "📑 종합 보고서"])
 
 with tab1:
     st.header("1. 전 지구 평균 해수면(GMSL) 변화 추이")
@@ -288,7 +293,6 @@ with tab2:
 
 with tab3:
     st.header("점점 오염되는 우리 바다")
-    # 이하 코드는 이전 버전과 동일하게 유지됩니다.
     st.markdown("해수면 상승뿐만 아니라, 인간이 버린 쓰레기는 바다를 병들게 하는 또 다른 주범입니다. 특히 플라스틱은 해양 생태계를 직접적으로 파괴하며, 결국 우리 식탁의 안전까지 위협합니다.")
     st.subheader("국내 연도별 해양쓰레기 수거량 변화")
     debris_melted = debris_df.melt(id_vars='연도', var_name='쓰레기 종류', value_name='발생량 (톤)')
@@ -437,7 +441,7 @@ with tab5:
                 st.rerun()
 
     with subtab2:
-        st.title("🃏 환경 정책 카드 게임")
+        st.header("🃏 환경 정책 카드 게임")
         st.write("카드를 뽑아 도시의 환경 점수를 관리하세요!\n정책 카드와 자연/재난 카드가 랜덤으로 등장합니다.")
 
         if "card_game_cards" not in st.session_state:
@@ -450,24 +454,26 @@ with tab5:
             st.session_state.card_game_score = 50
             st.session_state.card_game_turns = 0
             st.session_state.card_game_history = []
-
-        if st.button("카드 뽑기"):
-            card, effect, category = random.choice(st.session_state.card_game_cards)
-            st.session_state.card_game_score += effect
-            st.session_state.card_game_turns += 1
-            st.session_state.card_game_history.append(f"{st.session_state.card_game_turns}턴: {category} 카드 - {card} ({effect:+})")
-            if effect > 0:
-                st.success(f"✅ {card} ({category} 카드) 뽑음! 점수 {effect:+}")
-            else:
-                st.error(f"⚠️ {card} ({category} 카드) 뽑음! 점수 {effect:+}")
-
+        
+        if st.session_state.card_game_turns < 7:
+            if st.button("🃏 카드 뽑기"):
+                card, effect, category = random.choice(st.session_state.card_game_cards)
+                st.session_state.card_game_score += effect
+                st.session_state.card_game_turns += 1
+                st.session_state.card_game_history.append(f"{st.session_state.card_game_turns}턴: {category} 카드 - {card} ({effect:+})")
+                if effect > 0:
+                    st.success(f"✅ {card} ({category} 카드) 뽑음! 점수 {effect:+}")
+                else:
+                    st.error(f"⚠️ {card} ({category} 카드) 뽑음! 점수 {effect:+}")
+                st.rerun()
+        
         st.metric("환경 점수", st.session_state.card_game_score)
         st.write(f"🔹 뽑은 카드 수: {st.session_state.card_game_turns} / 최대 7턴")
 
         if st.session_state.card_game_history:
-            st.subheader("📜 카드 뽑은 내역")
-            for h in reversed(st.session_state.card_game_history):
-                st.write(h)
+            with st.expander("📜 카드 뽑은 내역 보기"):
+                for h in reversed(st.session_state.card_game_history):
+                    st.write(h)
 
         if st.session_state.card_game_turns >= 7:
             st.subheader("📊 최종 결과")
@@ -487,3 +493,39 @@ with tab5:
                 st.session_state.card_game_history = []
                 st.rerun()
 
+with tab6:
+    st.header("📑 종합 보고서: 요약 및 결론")
+    st.markdown("### 1. 서론: 바다의 위기는 어떻게 우리 식탁의 위기가 되는가?")
+    st.markdown("""
+    본 대시보드는 '해수면 상승'이라는 거대한 환경 문제가 단순히 해안선 침수에서 그치지 않고, 해양 생태계 파괴, 수산물 생산량 변화를 거쳐 결국 **우리의 식생활과 건강**이라는 매우 개인적인 문제로 이어지는 연쇄적인 과정을 데이터로 추적하고 분석했습니다.
+    """)
+
+    st.markdown("### 2. 데이터 분석 요약: 위기의 연쇄 고리")
+    st.markdown("""
+    - **1단계 (원인): 전 지구적 위기**
+        - 온실가스 배출량의 지속적인 증가는 지구 온난화를 가속하고, 이는 **해수의 열팽창**과 **빙하 융해**를 통해 전 지구적인 해수면 상승을 초래하고 있습니다.
+    
+    - **2단계 (중간 영향): 병들어 가는 대한민국 바다**
+        - 전 지구적 변화는 대한민국 연안의 **수온 상승**을 유발했습니다. 이로 인해 한류성 어종인 **살오징어**와 양식 품목인 **굴, 미역** 등의 생산량은 뚜렷한 감소세를 보였습니다.
+        - 동시에, 인간 활동으로 발생한 **해양 쓰레기**, 특히 플라스틱 오염은 해양 생태계 자체를 위협하는 심각한 요인으로 작용하고 있습니다.
+
+    - **3단계 (최종 영향): 우리 식탁의 변화와 건강 문제**
+        - 수산물의 생산량 감소와 해양 오염에 대한 우려는 자연스럽게 수산물 소비 감소로 이어졌습니다.
+        - 이는 특히 성장기 청소년들에게 필수적인 **오메가-3, 칼슘, 철분**과 같은 핵심 영양소의 섭취 지수가 지속적으로 하락하는 결과로 나타났습니다. 즉, 바다의 위기는 **미래 세대의 건강 문제**로 직결되고 있습니다.
+    """)
+    
+    st.markdown("### 3. 결론 및 시사점")
+    st.markdown("""
+    - **결론:** 해수면 상승과 해양 오염은 먼바다의 이야기가 아닌, **우리의 식량 안보와 건강을 직접적으로 위협하는 현실적인 문제**입니다. 데이터는 이 모든 과정이 어떻게 연결되어 있는지를 명확하게 보여줍니다.
+    - **미래 전망:** 현재의 고탄소 배출 시나리오가 계속된다면, 미래에는 해안 도시의 침수뿐만 아니라 안정적인 수산물 공급망 붕괴와 심각한 영양 불균형 문제에 직면하게 될 것입니다.
+    - **우리의 과제:** 따라서 탄소 배출을 줄이고 해양 환경을 보호하는 것은 단순히 지구를 위한 행동을 넘어, **우리의 건강한 식탁과 미래 세대의 건강을 지키기 위한 필수적인 과제**입니다. 이 대시보드가 그 변화를 위한 작은 시작점이 되기를 바랍니다.
+    """)
+    
+    st.markdown("### 📚 참고 자료")
+    st.markdown("""
+    - NASA/NOAA Sea Level Change Portal
+    - IPCC AR6 보고서
+    - 온실가스종합정보센터, KOSIS 국가통계포털
+    - 해양수산부 통계시스템, 어업생산동향조사
+    - 청소년건강행태온라인조사, 국민건강영양조사
+    """)
