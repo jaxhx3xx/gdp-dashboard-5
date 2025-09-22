@@ -356,11 +356,11 @@ with tab4:
     rise_level_m = st.slider("미래 해수면 상승 높이 선택 (단위: m)", 0.5, 2.0, 1.0, 0.1)
 
     city_scenarios = {
-        "인천 (대한민국)": {"img": "https://images.unsplash.com/photo-1570197415232-a5b81a425a5d?q=80&w=2070&auto=format&fit=crop", "base_pop": 800000, "base_econ": "공항/항만 기능"},
-        "뉴욕 (미국)": {"img": "https://images.unsplash.com/photo-1532984212030-a88a_5995b058?q=80&w=1932&auto=format&fit=crop", "base_pop": 2000000, "base_econ": "세계 금융 중심지"},
-        "상하이 (중국)": {"img": "https://images.unsplash.com/photo-1593021422723-b095f1a547a4?q=80&w=2070&auto=format&fit=crop", "base_pop": 17500000, "base_econ": "글로벌 물류 허브"},
-        "암스테르담 (네덜란드)": {"img": "https://images.unsplash.com/photo-1589882261689-1e3dfe270273?q=80&w=2070&auto=format&fit=crop", "base_pop": 1200000, "base_econ": "기존 방재 시스템"},
-        "도쿄 (일본)": {"img": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=2070&auto=format&fit=crop", "base_pop": 1500000, "base_econ": "수도 기능 및 경제 중심지"}
+        "인천 (대한민국)": {"img": "/workspaces/gdp-dashboard-5/incheon.png", "base_pop": 800000, "base_econ": "공항/항만 기능"},
+        "뉴욕 (미국)": {"img": "/workspaces/gdp-dashboard-5/newyork.png", "base_pop": 2000000, "base_econ": "세계 금융 중심지"},
+        "상하이 (중국)": {"img": "/workspaces/gdp-dashboard-5/shanghai.png", "base_pop": 17500000, "base_econ": "글로벌 물류 허브"},
+        "암스테르담 (네덜란드)": {"img": "/workspaces/gdp-dashboard-5/amsterdam.png", "base_pop": 1200000, "base_econ": "기존 방재 시스템"},
+        "도쿄 (일본)": {"img": "/workspaces/gdp-dashboard-5/tokyo.png", "base_pop": 1500000, "base_econ": "수도 기능 및 경제 중심지"}
     }
     selected_city = st.selectbox("확인하고 싶은 도시를 선택하세요:", list(city_scenarios.keys()))
     city_info = city_scenarios[selected_city]
